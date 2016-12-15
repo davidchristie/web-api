@@ -9,5 +9,18 @@
       <li>{{name}} ({{email}})</li>
     {{/each}}
     </ul>
+    <form action="/profile" method="post">
+      <h4>Find profile</h4>
+      <input type="text" name="name" placeholder="User's name">
+      <input type="submit" value="Find">
+    </form>
+    <form action="/" method="post">
+      <h4>New profile</h4>
+      <input type="text" name="name" placeholder="Name">
+      <input type="text" name="email" placeholder="Email">
+      <input type="text" name="picture" placeholder="Profile picture URL">
+      <input type="text" name="id" placeholder="ID number">
+      <input type="submit" value="Go">
+    </form>
   </body>
 </html>
