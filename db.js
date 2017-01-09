@@ -2,11 +2,18 @@ var environment = process.env.NODE_ENV || 'development'
 var config = require('./knexfile')[environment]
 var connection = require('knex')(config)
 
-module.exports = {
-  getUser: getUser,
-  getUsers: getUsers,
-  newUser: newUser,
-  //getBlogs: getBlogs
+function deleteUser (id, testDb) {
+  var db = testDb || connection
+  return db('users')
+    .where('users.id', id)
+    .delete()
+}
+
+function getUser (id, testDb) {
+  var db = testDb || connection
+  return db('users')
+  .where('users.id', id)
+  .first()
 }
 
 function getUsers (testDb) {
@@ -15,27 +22,32 @@ function getUsers (testDb) {
   return db('users').select()
 }
 
-function getUser (name, testDb) {
-  var db = testDb || connection
-  return db('users')
-  .join('profiles', 'users.id', '=', 'profiles.user_id')
-  .join("blogs", "users.id", "=", "blogs.user_id")
-  .select('users.name', 'users.email', 'profiles.picture as picture', "blogs.title as title", "blogs.blog_text as text")
-  .where('users.name', name)
-}
-
 function newUser (user, profile, testDb) {
   var db = testDb || connection
-  return Promise.all([
-    db('users').insert(user),
-    db('profiles').insert(profile)
-  ])
+  return db('users')
+    .insert(user)
+    .then(ids => {
+      var id = ids[0]
+      profile.user_id = id
+      db('profiles').insert(profile)
+      return {id, name: user.name, email: user.email}
+    })
 }
 
-// function getBlogs(user, testDb){
-//   var db = testDb || connection
-//   return db("users")
-//   .join("blogs", "users.id", "=", "blogs.user_id")
-//   .select("users.name", "blogs.title as title", "blogs.blog_text as text")
-//   .where("users.name", user)
-// }
+function updateUser(user, testDb) {
+  var db = testDb || connection
+  return db('users')
+    .where('id', user.id)
+    .update({
+      name: user.name,
+      email: user.email
+    })
+}
+
+module.exports = {
+  deleteUser,
+  getUser,
+  getUsers,
+  newUser,
+  updateUser
+}

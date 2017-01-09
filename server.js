@@ -4,7 +4,7 @@ var express = require('express')
 var bodyParser = require('body-parser')
 var hbs = require('express-handlebars')
 
-var index = require('./routes/index')
+var users = require('./routes/users')
 
 var server = express()
 
@@ -16,10 +16,8 @@ server.engine('hbs', hbs({extname: 'hbs'}))
 server.set('view engine', 'hbs')
 server.set('views', path.join(__dirname, 'views'))
 server.use(bodyParser.urlencoded({ extended: true }))
+server.use(bodyParser.json())
 
 // Routes
 
-server.get('/', index.get)
-server.post('/profile', index.getProfile)
-server.post('/', index.newProfile)
-//server.get('/blog/:title', index.getBlog)
+server.use('/users', users)
